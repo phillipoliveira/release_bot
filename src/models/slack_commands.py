@@ -125,6 +125,9 @@ class SlackCommands(object):
         slack_client.api_call("api.test")
         slack_client.api_call("auth.test")
 
+    @classmethod
+    def send_raw_message(cls, team_id, channel, text):
+        cls.get_slack_token(team_id).api_call("chat.postMessage", channel=channel, text=text)
 
 # Deleting a message:
 # slack = SlackCommands()
