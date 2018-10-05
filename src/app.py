@@ -40,8 +40,7 @@ def post_install():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern1 = re.compile("rel_.* release notes")
-    pattern2 = re.compile("Deploying rel_*to staging")
+    pattern = re.compile("(rel_.* release notes|deploying rel_.* to staging)")
     if "challenge" in event_data:
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
@@ -53,8 +52,7 @@ def events():
         if all([("event" in event_data),
                 (event_data['event']['channel'] == "G5GB3E2UQ"),
                 (event_data['event']['type'] == "message"),
-                (any([(pattern1.findall(event_data['event']['text'].lower())),
-                      (pattern2.findall(event_data['event']['text'].lower()))]))]):
+                (pattern.findall(event_data['event']['text'].lower()))]):
             SlackCommands.send_raw_message(team_id=event_data['team_id'], channel="G5GB3E2UQ")
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
