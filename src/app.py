@@ -30,7 +30,7 @@ def post_install():
             token = SlackCommands.get_token_from_database(team_id=auth_response['team_id'],
                                                           user_id=auth_response['user_id'])
             token.update_token(auth_response)
-        except KeyError:
+        except TypeError:
             token = SlackCommands()
             token.add_token(auth_response)
         return Response('It worked!')
