@@ -28,10 +28,10 @@ class SlackCommands(object):
             slack_token_object = cls.get_token_from_database(team_id=team_id,
                                                              user_id=user_id)
         except TypeError:
-            print("Visit http://178.128.234.3:6000/release_bot/begin_auth to authorize this app")
+            print("Visit http://178.128.234.3:4500/release_bot/begin_auth to authorize this app")
             raise ValueError("Slack authorization failed")
         if slack_token_object.token_expiry_time is None:
-            print("Visit http://178.128.234.3:6000/release_bot/begin_auth to authorize this app")
+            print("Visit http://178.128.234.3:4500/release_bot/begin_auth to authorize this app")
             raise ValueError("Slack authorization failed")
         elif int(slack_token_object.token_expiry_time) < int(time.time()):
             hook = cls.get_token_from_database(team_id=team_id,
