@@ -1,5 +1,6 @@
 from slackclient import SlackClient
 from commons.database import Database
+from models.giphy import GiphyCommands
 import time
 import uuid
 import re
@@ -127,7 +128,11 @@ class SlackCommands(object):
 
     @classmethod
     def send_raw_message(cls, team_id, channel, text):
-        cls.get_slack_token(team_id).api_call("chat.postMessage", channel=channel, text=text)
+        cls.get_slack_token(team_id).api_call("chat.postMessage",
+                                              channel=channel,
+                                              text=text,
+                                              attachments=[{"image_url": GiphyCommands.get_gif()}])
+
 
 # Deleting a message:
 # slack = SlackCommands()
