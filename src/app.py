@@ -26,7 +26,6 @@ def post_install():
         auth_code = request.args['code']
         # An empty string is a valid token for this request
         auth_response = SlackCommands.slack_token_request(auth_code)
-        print(auth_response)
         try:
             token = SlackCommands.get_token_from_database(team_id=auth_response['team_id'],
                                                           user_id=auth_response['user_id'])
