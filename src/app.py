@@ -54,7 +54,8 @@ def events():
                 (event_data['event']['channel'] == "GCPJJ4G3U"),
                 (event_data['event']['type'] == "message"),
                 (pattern.findall(event_data['event']['text']))]):
-            SlackCommands.send_raw_message(team_id=event_data['team_id'],channel="GCPJJ4G3U", text="good work!")
+            print("it worked!")
+            SlackCommands.send_raw_message(team_id=event_data['team_id'], channel="GCPJJ4G3U", text="good work!")
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
 
