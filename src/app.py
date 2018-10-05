@@ -49,6 +49,7 @@ def events():
         if event_data['event']['subtype'] == 'message_deleted':
             return json.dumps({'success': True}), 200, {"content_type": "application/json"}
     except KeyError:
+        print(event_data)
         if all([("event" in event_data),
                 (event_data['event']['channel'] == "GCPJJ4G3U"),
                 (event_data['event']['type'] == "message"),
