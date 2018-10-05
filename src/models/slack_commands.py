@@ -127,13 +127,18 @@ class SlackCommands(object):
         slack_client.api_call("auth.test")
 
     @classmethod
-    def send_raw_message(cls, team_id, channel, text):
+    def send_raw_message(cls, team_id, channel):
         cls.get_slack_token(team_id).api_call("chat.postMessage",
                                               channel=channel,
-                                              text=text,
-                                              attachments=[{"image_url": GiphyCommands.get_gif()}])
+                                              attachments=[
+                                                             {
+                                                                 "fallback": "Good job!",
+                                                                 "image_url": GiphyCommands.get_gif()
+                                                             }
+                                                          ])
 
 
 # Deleting a message:
 # slack = SlackCommands()
 # slack.delete_message(channel_id='C0JS385LP', ts='1537797654.000100')
+

@@ -28,4 +28,6 @@ class GiphyCommands(object):
                 cls.get_keyword_from_database(),
                 cls.get_token_from_database()
             )))
-        return data.json()['data'][random.randint(0, 100)]['images']['original']['url']
+        return data.json()['data'][random.randint(0, 100)]['images']['downsized']['url']
+
+
