@@ -1,5 +1,6 @@
 from flask import Flask, request, Response, make_response
 from models.slack_commands import SlackCommands
+from models.logging import Logging
 import re
 
 import json
@@ -41,6 +42,7 @@ def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
     pattern = re.compile("(rel_.* release notes|deploying rel_.* staging)")
+    Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
@@ -49,7 +51,6 @@ def events():
         if event_data['event']['subtype'] == 'message_deleted':
             return json.dumps({'success': True}), 200, {"content_type": "application/json"}
     except KeyError:
-        print(event_data)
         if all([("event" in event_data),
                 (event_data['event']['channel'] == "G5GB3E2UQ"),
                 (event_data['event']['type'] == "message"),
