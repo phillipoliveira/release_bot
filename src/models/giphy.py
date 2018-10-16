@@ -24,7 +24,7 @@ class GiphyCommands(object):
     def get_gif(cls):
         import requests
         data = (requests.get(
-            "http://api.giphy.com/v1/gifs/search?q={}&api_key={}&limit=100".format(
+            "http://api.giphy.com/v1/gifs/search?q={}&api_key={}&limit=100&rating=pg-13".format(
                 cls.get_keyword_from_database(),
                 cls.get_token_from_database()
             )))
