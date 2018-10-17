@@ -20,5 +20,4 @@ class MessageLog(object):
         database = Database()
         database.initialize()
         result = database.find_one("message_log", {"trigger_ts": ts})
-        print(result)
         return cls(**result)
