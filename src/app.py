@@ -1,6 +1,7 @@
 from flask import Flask, request, Response, make_response
 from models.slack_commands import SlackCommands
 from models.logging import Logging
+from models.message_log import MessageLog
 import re
 
 import json
@@ -47,19 +48,26 @@ def events():
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
+    channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
-            return json.dumps({'success': True}), 200, {"content_type": "application/json"}
+            delete_check = MessageLog.get_entry_by_ts(['event']['event_ts'])
+            if delete_check is not None:
+                SlackCommands.delete_message(team_id=channel, ts=delete_check.gif_ts)
     except KeyError:
         if all([("event" in event_data),
-                (event_data['event']['channel'] == "G5GB3E2UQ"),
+                (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
                 (pattern.findall(event_data['event']['text'].lower()))]):
-            SlackCommands.send_raw_message(team_id=event_data['team_id'], channel="G5GB3E2UQ")
+            response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
+            message = MessageLog(trigger_ts=['event']['event_ts'],
+                                 gif_ts=response['ts'])
+            message.add_entry()
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
 
 # team_freedom = G5GB3E2UQ
+# phill test =
 # {'event_time': 1538668365, 'authed_users': ['U1V9CPH89'], 'team_id': 'T0JRP51QF', 'token': 'c5P54hYmXPH2OOKC4gFhqxLK', 'api_app_id': 'AD7G0J78D', 'type': 'event_callback', 'event': {'user': 'U1V9CPH89', 'text': '.', 'client_msg_id': 'b5d1460f-e896-4406-b69a-9fdc6dd9b9ea', 'channel_type': 'group', 'event_ts': '1538668365.000100', 'type': 'message', 'ts': '1538668365.000100', 'channel': 'G5GB3E2UQ'}, 'event_id': 'EvD7AXRW4A'}
 
 
