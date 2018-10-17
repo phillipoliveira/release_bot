@@ -2,7 +2,7 @@ from commons.database import Database
 
 
 class MessageLog(object):
-    def __init__(self, trigger_ts, gif_ts, trigger_user):
+    def __init__(self, trigger_ts, gif_ts):
         self.trigger_ts = trigger_ts
         self.gif_ts = gif_ts
 
