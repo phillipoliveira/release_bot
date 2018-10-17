@@ -51,7 +51,6 @@ def events():
     channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
-            print(event_data['event']['previous_message']['ts'])
             delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
             if delete_check is not None:
                 SlackCommands.delete_message(team_id=channel, ts=delete_check.gif_ts)
