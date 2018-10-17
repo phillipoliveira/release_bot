@@ -145,7 +145,7 @@ class SlackCommands(object):
             channel=channel_id,
             ts=ts
         ))
-        return response
+        print(response)
 # Deleting a message:
 # slack = SlackCommands()
 # slack.delete_message(channel_id='C0JS385LP', ts='1537797654.000100')
