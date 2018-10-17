@@ -60,6 +60,8 @@ def events():
                 (event_data['event']['type'] == "message"),
                 (pattern.findall(event_data['event']['text'].lower()))]):
             response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
+            print(response)
+            print(event_data)
             message = MessageLog(trigger_ts=event_data['event']['event_ts'],
                                  gif_ts=response['ts'])
             message.add_entry()
