@@ -140,15 +140,12 @@ class SlackCommands(object):
 
     @classmethod
     def delete_message(cls, team_id, channel_id, ts):
-        print("team_id: {}".format(team_id))
-        print("channel_id: {}".format(channel_id))
-        print("ts:{}".format(ts))
         response = (cls.get_slack_token(team_id=team_id).api_call(
             "chat.delete",
             channel=channel_id,
             ts=ts
         ))
-        print("deletion response: {}".format(response))
+        return response
 # Deleting a message:
 # slack = SlackCommands()
 # slack.delete_message(channel_id='C0JS385LP', ts='1537797654.000100')
