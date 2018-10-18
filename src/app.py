@@ -52,6 +52,7 @@ def events():
     print("event data: {}".format(event_data))
     try:
         if event_data['event']['subtype'] == 'message_deleted':
+            print(event_data['event']['previous_message']['ts'])
             delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
             print("delete_check: {}".format(delete_check.json()))
             if delete_check is not None:
