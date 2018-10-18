@@ -48,7 +48,7 @@ def events():
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
-    channel = "GCPJJ4G3U"
+    channel = "G5GB3E2UQ"
     print("event data: {}".format(event_data))
     try:
         if event_data['event']['subtype'] == 'message_deleted':
@@ -73,7 +73,7 @@ def events():
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
 
 # team_freedom = G5GB3E2UQ
-# phill test =
+# phill test = GCPJJ4G3U
 # {'event_time': 1538668365, 'authed_users': ['U1V9CPH89'], 'team_id': 'T0JRP51QF', 'token': 'c5P54hYmXPH2OOKC4gFhqxLK', 'api_app_id': 'AD7G0J78D', 'type': 'event_callback', 'event': {'user': 'U1V9CPH89', 'text': '.', 'client_msg_id': 'b5d1460f-e896-4406-b69a-9fdc6dd9b9ea', 'channel_type': 'group', 'event_ts': '1538668365.000100', 'type': 'message', 'ts': '1538668365.000100', 'channel': 'G5GB3E2UQ'}, 'event_id': 'EvD7AXRW4A'}
 
 
