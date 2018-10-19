@@ -48,10 +48,12 @@ def events():
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
-    channel = "G5GB3E2UQ"
+    print("event data: {}".format(event_data))
+    channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
             delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
+            print("delete check result: {}".format(delete_check))
             if delete_check is not None:
                 SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
     except KeyError:
@@ -60,8 +62,10 @@ def events():
                 (event_data['event']['type'] == "message"),
                 (pattern.findall(event_data['event']['text'].lower()))]):
             response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
+            print("response to sent message: {}".format(response))
             message = MessageLog(trigger_ts=event_data['event']['event_ts'],
                                  gif_ts=response['ts'])
+            print("message log entry: {}".format(message.json()))
             message.add_entry()
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
