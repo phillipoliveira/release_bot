@@ -42,7 +42,7 @@ def post_install():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile("(rel_.* release notes|deploying rel_.* staging|deployed rel.* staging)")
+    pattern = re.compile("(rel_.* release notes|deploying rel_.* staging|deployed rel.* staging|dερlουινg rel_.* to staging)")
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
