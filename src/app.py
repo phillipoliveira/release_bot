@@ -51,7 +51,7 @@ def events():
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
     print("event data: {}".format(event_data))
-    channel = "G5GB3E2UQ"
+    channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
             delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
@@ -62,7 +62,7 @@ def events():
         if all([("event" in event_data),
                 (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
-                (pattern.findall(event_data['event']['text'].lower()))]):
+                (pattern.findall(' '.join(event_data['event']['text'].lower().split())))]):
             response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
             print("response to sent message: {}".format(response))
             message = MessageLog(trigger_ts=event_data['event']['event_ts'],
