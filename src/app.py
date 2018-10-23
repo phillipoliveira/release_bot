@@ -42,14 +42,16 @@ def post_install():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile("(rel_.* release notes|deploying rel_.* staging|deployed rel.* staging|dερlουινg rel_.* to staging)")
+    pattern = re.compile("(r[ε|e]l.* r[ε|e]l[ε|e]as[ε|e] not[ε|e]s|"
+                         "d[ε|e][ρ|p]lο[υ|y][ε|e]d r[ε|e]l.* stag[ι|i][ν|n]g|"
+                         "d[ε|e][ρ|p]lο[υ|y][ι|i][ν|n]g r[ε|e]l.* stag[ι|i][ν|n]g)")
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
     print("event data: {}".format(event_data))
-    channel = "G5GB3E2UQ"
+    channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
             delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
