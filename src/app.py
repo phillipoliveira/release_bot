@@ -42,9 +42,11 @@ def post_install():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile("(r[ε|e][l|i|ι].*r[ε|e]l[ε|e]as[ε|e]not[ε|e]s|"
-                         "d[ε|e][ρ|p]l[ο|o][υ|y][ε|e]dr[ε|e]l.*stag[ι|i][ν|n]g|"
-                         "d[ε|e][ρ|p]l[ο|o][υ|y][ι|i][ν|n]gr[ε|e]l.*stag[ι|i][ν|n]g)")
+    pattern = re.compile(
+        "([r|ｒ][ε|e|ｅ][l|i|ι|ｌ|ｉ].*[r|ｒ][ε|e|ｅ][l|i|ι|ｌ|ｉ][ε|e|ｅ][a|ａ][s|ｓ][ε|e|ｅ][ν|n|ｎ][o|ｏ][t|ｔ][ε|e|ｅ][s|ｓ]|"
+        "[d|ｄ][ε|e|ｅ][ρ|p|ｐ][l|i|ι|ｌ|ｉ][ο|o|ｏ][υ|y|ｙ][ε|e|ｅ][d|ｄ][r|ｒ][ε|e|ｅ][l|i|ι|ｌ|ｉ].*[s|ｓ][t|ｔ][a|ａ][g|ｇ][l|i|ι|ｌ|ｉ][ν|n|ｎ][g|ｇ]|"
+        "[d|ｄ][ε|e|ｅ][ρ|p|ｐ][l|i|ι|ｌ|ｉ][ο|o|ｏ][υ|y|ｙ][l|i|ι|ｌ|ｉ][ν|n|ｎ][g|ｇ][r|ｒ][ε|e|ｅ][l|i|ι|ｌ|ｉ].*[s|ｓ][t|ｔ][a|ａ][g|ｇ][l|i|ι|ｌ|ｉ][ν|n|ｎ][g|ｇ])")
+
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
