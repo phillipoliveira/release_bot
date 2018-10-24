@@ -42,9 +42,9 @@ def post_install():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile("(r[ε|e][l|i|ι].* r[ε|e][l|i|ι][ε|e]as[ε|e] n[ο|o]t[ε|e]s|"
-                         "d[ε|e][ρ|p][l|i|ι][ο|o][υ|y][ε|e]d r[ε|e][l|i|ι].* stag[l|i|ι][ν|n]g|"
-                         "d[ε|e][ρ|p][l|i|ι][ο|o][υ|y][l|i|ι][ν|n]g r[ε|e][l|i|ι].* stag[l|i|ι][ν|n]g)")
+    pattern = re.compile("(r[ε|e][l|i|ι].*r[ε|e]l[ε|e]as[ε|e]not[ε|e]s|"
+                         "d[ε|e][ρ|p]l[ο|o][υ|y][ε|e]dr[ε|e]l.*stag[ι|i][ν|n]g|"
+                         "d[ε|e][ρ|p]l[ο|o][υ|y][ι|i][ν|n]gr[ε|e]l.*stag[ι|i][ν|n]g)")
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
@@ -62,7 +62,7 @@ def events():
         if all([("event" in event_data),
                 (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
-                (pattern.findall(' '.join(event_data['event']['text'].lower().split())))]):
+                (pattern.findall(event_data['event']['text'].lower().replace(" ","")))]):
             response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
             print("response to sent message: {}".format(response))
             message = MessageLog(trigger_ts=event_data['event']['event_ts'],
