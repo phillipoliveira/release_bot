@@ -82,8 +82,13 @@ class Regex(object):
         main_regex = Regex(regex=regexs, type="main")
         return main_regex
 
+    @staticmethod
+    def find_entry(regex):
+        database = Database()
+        database.initialize()
+        entry = database.find_one("regex", {"regex": regex})
+        return entry
 
-regex = Regex(regex="newerreegx", type="sub")
-regex.add_entry()
-Regex.update_main_regex()
-print(Regex.get_main_regex().regex)
+
+
+

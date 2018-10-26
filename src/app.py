@@ -83,7 +83,7 @@ def events():
             else:
                 SlackCommands.send_message(team_id=event_data['team_id'],
                                            channel=channel,
-                                           message="something fucked up :D")
+                                           message="Already added :D")
 
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
@@ -108,11 +108,15 @@ def delete_gif(event_data, channel):
 def add_regex(event_data, channel):
     message = event_data['event']['text']
     clean_msg = unicodedata.normalize('NFKC', message).lower().replace(" ", "").replace("\n", "")
-    regex = Regex(regex=clean_msg, type="sub")
-    regex.add_entry()
-    Regex.update_main_regex()
-    send_gif(event_data=event_data, channel=channel)
-    return True
+    existing_check = Regex.find_entry(clean_msg)
+    if existing_check is not None:
+        return False
+    else:
+        regex = Regex(regex=clean_msg, type="sub")
+        regex.add_entry()
+        Regex.update_main_regex()
+        send_gif(event_data=event_data, channel=channel)
+        return True
 
 # team_freedom = G5GB3E2UQ
 # phill test = GCPJJ4G3U
