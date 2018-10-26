@@ -42,10 +42,10 @@ class Regex(object):
     def update_main_regex(cls):
         old_main = cls.get_main_regex()
         new_main = cls.build_main_regex()
+        new_main._id = old_main._id
         if old_main.regex != '$^':
             database = Database()
             database.initialize()
-            old_main.regex = new_main
             database.update("regex", query=old_main.json(), update=new_main.json())
         else:
             new_main.add_entry()
@@ -82,3 +82,8 @@ class Regex(object):
         main_regex = Regex(regex=regexs, type="main")
         return main_regex
 
+
+regex = Regex(regex="newerreegx", type="sub")
+regex.add_entry()
+Regex.update_main_regex()
+print(Regex.get_main_regex().regex)
