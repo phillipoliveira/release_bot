@@ -127,7 +127,7 @@ class SlackCommands(object):
         slack_client.api_call("auth.test")
 
     @classmethod
-    def send_raw_message(cls, team_id, channel):
+    def send_gif(cls, team_id, channel):
         response = cls.get_slack_token(team_id).api_call("chat.postMessage",
                                                           channel=channel,
                                                           attachments=[
@@ -136,6 +136,13 @@ class SlackCommands(object):
                                                                              "image_url": GiphyCommands.get_gif()
                                                                          }
                                                                       ])
+        return response
+
+    @classmethod
+    def send_message(cls, team_id, channel, message):
+        response = cls.get_slack_token(team_id).api_call("chat.postMessage",
+                                                         channel=channel,
+                                                         text=message)
         return response
 
     @classmethod

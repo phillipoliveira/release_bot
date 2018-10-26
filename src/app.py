@@ -1,7 +1,9 @@
+# coding: utf-8
 from flask import Flask, request, Response, make_response
 from models.slack_commands import SlackCommands
 from models.logging import Logging
 from models.message_log import MessageLog
+from models.regex import Regex
 import unicodedata
 import re
 
@@ -39,14 +41,21 @@ def post_install():
         return Response('It worked!')
 
 
+@app.route('/release_bot/learn', methods=['POST'])
+def return_fact():
+    # Echo the URL verification challenge code back to Slack
+    response = app.response_class(
+        response={"text": "I gotchu bro"},
+        status=200,
+        mimetype='application/json')
+    return response
+
+
 @app.route('/release_bot/events', methods=['POST'])
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile("(r[ε|e][l|i|ι].*r[ε|e]l[ε|e]as[ε|e]not[ε|e]s|"
-                         "d[ε|e][ρ|p]l[ο|o][υ|y][ε|e]dr[ε|e]l.*stag[ι|i][ν|n]g|"
-                         "d[ε|e][ρ|p]l[ο|o][υ|y][ι|i][ν|n]gr[ε|e]l.*stag[ι|i][ν|n]g)")
-
+    pattern = re.compile(Regex.get_main_regex().regex)
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
@@ -56,28 +65,57 @@ def events():
     channel = "G5GB3E2UQ"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
-            delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
-            print("delete check result: {}".format(delete_check))
-            if delete_check is not None:
-                SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
+            delete_gif(event_data, channel)
     except KeyError:
         if all([("event" in event_data),
                 (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
                 (pattern.findall(unicodedata.normalize('NFKC', event_data['event']['text'].lower().replace(" ", "").replace("\n", ""))))]):
-            response = SlackCommands.send_raw_message(team_id=event_data['team_id'], channel=channel)
-            print("response to sent message: {}".format(response))
-            message = MessageLog(trigger_ts=event_data['event']['event_ts'],
-                                 gif_ts=response['ts'])
-            print("message log entry: {}".format(message.json()))
-            message.add_entry()
+            send_gif(event_data, channel)
+        elif all([("event" in event_data),
+                  (event_data['event']['channel'] == "DDCL7GCV7"),
+                  (event_data['event']['channel'] == "U1V9CPH89"),
+                  (event_data['event']['channel'])]):
+            if add_regex(event_data=event_data, channel=channel):
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel=channel,
+                                           message="I gotchu fam :+1:")
+            else:
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel=channel,
+                                           message="something fucked up :D")
+
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
 
+
+def send_gif(event_data, channel):
+    response = SlackCommands.send_gif(team_id=event_data['team_id'], channel=channel)
+    print("response to sent message: {}".format(response))
+    message = MessageLog(trigger_ts=event_data['event']['event_ts'],
+                         gif_ts=response['ts'])
+    print("message log entry: {}".format(message.json()))
+    message.add_entry()
+
+
+def delete_gif(event_data, channel):
+    delete_check = MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts'])
+    print("delete check result: {}".format(delete_check))
+    if delete_check is not None:
+        SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
+
+
+def add_regex(event_data, channel):
+    message = event_data['event']['text']
+    clean_msg = unicodedata.normalize('NFKC', message).lower().replace(" ", "").replace("\n", "")
+    regex = Regex(regex=clean_msg, type="sub")
+    regex.add_entry()
+    Regex.update_main_regex()
+    send_gif(event_data=event_data, channel=channel)
+    return True
+
 # team_freedom = G5GB3E2UQ
 # phill test = GCPJJ4G3U
-# {'event_time': 1538668365, 'authed_users': ['U1V9CPH89'], 'team_id': 'T0JRP51QF', 'token': 'c5P54hYmXPH2OOKC4gFhqxLK', 'api_app_id': 'AD7G0J78D', 'type': 'event_callback', 'event': {'user': 'U1V9CPH89', 'text': '.', 'client_msg_id': 'b5d1460f-e896-4406-b69a-9fdc6dd9b9ea', 'channel_type': 'group', 'event_ts': '1538668365.000100', 'type': 'message', 'ts': '1538668365.000100', 'channel': 'G5GB3E2UQ'}, 'event_id': 'EvD7AXRW4A'}
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=4500)
