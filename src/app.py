@@ -82,7 +82,7 @@ def events():
                                            message="I gotchu fam :+1:")
             else:
                 SlackCommands.send_message(team_id=event_data['team_id'],
-                                           channel=channel,
+                                           channel="DDCL7GCV7",
                                            message="Already added :D")
 
     finally:
