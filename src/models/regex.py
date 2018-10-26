@@ -67,12 +67,12 @@ class Regex(object):
             start = ""
             letters = []
             for letter in sample.regex:
+                start += "{}"
                 try:
                     let_regex = cls.greek_translator[letter]
-                    start += "{}"
                     letters.append(let_regex)
                 except KeyError:
-                    continue
+                    letters.append(letter)
             regex = start.format(*letters)
             if count != sample_len:
                 regexs += regex + "|"
