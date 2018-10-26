@@ -78,7 +78,7 @@ def events():
                   (event_data['event']['channel'])]):
             if add_regex(event_data=event_data, channel=channel):
                 SlackCommands.send_message(team_id=event_data['team_id'],
-                                           channel=channel,
+                                           channel="DDCL7GCV7",
                                            message="I gotchu fam :+1:")
             else:
                 SlackCommands.send_message(team_id=event_data['team_id'],
