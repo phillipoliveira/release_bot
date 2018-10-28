@@ -105,7 +105,8 @@ def delete_gif(event_data, channel):
 
 def add_sample(event_data, channel):
     message = event_data['event']['text']
-    clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", "")
+    clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", " ")
+    print(clean_msg)
     if clean_msg.split()[:1] == "learn":
         clean_msg = " ".join(clean_msg.split()[1:])
         existing_check = Samples.find_entry(clean_msg)
