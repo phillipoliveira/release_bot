@@ -107,17 +107,14 @@ def add_sample(event_data, channel):
     print("trying..")
     message = event_data['event']['text']
     clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", " ")
-    print(clean_msg)
-    if clean_msg.split()[:1] == "learn":
-        clean_msg = " ".join(clean_msg.split()[1:])
-        existing_check = Samples.find_entry(clean_msg)
-        if existing_check is not None:
-            return False
-        else:
-            sample = Samples(text=clean_msg)
-            sample.add_entry()
-            send_gif(event_data=event_data, channel=channel)
-            return True
+    existing_check = Samples.find_entry(clean_msg)
+    if existing_check is not None:
+        return False
+    else:
+        sample = Samples(text=clean_msg)
+        sample.add_entry()
+        send_gif(event_data=event_data, channel=channel)
+        return True
 
 # def authenticate_signature(request):
 #
