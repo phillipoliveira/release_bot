@@ -66,23 +66,24 @@ def events():
         if event_data['event']['subtype'] == 'message_deleted':
             delete_gif(event_data, channel)
     except KeyError:
-        if all([("event" in event_data),
-                (event_data['event']['channel'] == channel),
-                (event_data['event']['type'] == "message"),
-                (Samples.evaluate(event_data['event']['text']))]):
-            send_gif(event_data, channel)
-        elif all([("event" in event_data),
-                  (event_data['event']['channel'] == "DDCL7GCV7"),
-                  (event_data['event']['user'] == "U1V9CPH89")]):
-            print("got here")
-            if add_sample(event_data=event_data, channel=channel):
-                SlackCommands.send_message(team_id=event_data['team_id'],
-                                           channel="DDCL7GCV7",
-                                           message="I gotchu fam :+1:")
-            else:
-                SlackCommands.send_message(team_id=event_data['team_id'],
-                                           channel="DDCL7GCV7",
-                                           message="Already added :D")
+        if MessageLog.get_entry_by_ts(event_data['event']['previous_message']['ts']) is None:
+            if all([("event" in event_data),
+                    (event_data['event']['channel'] == channel),
+                    (event_data['event']['type'] == "message"),
+                    (Samples.evaluate(event_data['event']['text']))]):
+                send_gif(event_data, channel)
+            elif all([("event" in event_data),
+                      (event_data['event']['channel'] == "DDCL7GCV7"),
+                      (event_data['event']['user'] == "U1V9CPH89")]):
+                print("got here")
+                if add_sample(event_data=event_data, channel=channel):
+                    SlackCommands.send_message(team_id=event_data['team_id'],
+                                               channel="DDCL7GCV7",
+                                               message="I gotchu fam :+1:")
+                else:
+                    SlackCommands.send_message(team_id=event_data['team_id'],
+                                               channel="DDCL7GCV7",
+                                               message="Already added :D")
 
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
@@ -102,6 +103,7 @@ def delete_gif(event_data, channel):
     print("delete check result: {}".format(delete_check))
     if delete_check is not None:
         SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
+
 
 
 def add_sample(event_data, channel):

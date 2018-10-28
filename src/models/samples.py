@@ -80,13 +80,12 @@ class Samples(object):
         tests = []
         for i in raws:
             tests.append(Samples.evaluate(i))
-        if all(tests):
-            print("Tests passed")
+        print("{}/5 tests passed".format(sum(tests)))
 
         for sample in samples:
             sample_obj = Samples.find_entry(sample)
             sample_obj.remove_entry()
 
 
-# Samples.test()
+Samples.test()
 
