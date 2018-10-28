@@ -39,8 +39,8 @@ class Samples(object):
     def evaluate(cls, msg):
         samples = cls.get_entries()
         nums = []
-        no_weirdness = unidecode(unicode(msg,'utf-8'))
-        msg = unicodedata.normalize('NFKC', unicode(no_weirdness.lower().replace("\n", " ")))
+        no_weirdness = unidecode(msg)
+        msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))
         for sample in samples:
             test_length = min(len(sample.text.split()), len(msg.split()))
             combinations = itertools.combinations(msg.split(), test_length)
