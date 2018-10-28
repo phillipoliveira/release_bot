@@ -74,6 +74,7 @@ def events():
         elif all([("event" in event_data),
                   (event_data['event']['channel'] == "DDCL7GCV7"),
                   (event_data['event']['user'] == "U1V9CPH89")]):
+            print("got here")
             if add_sample(event_data=event_data, channel=channel):
                 SlackCommands.send_message(team_id=event_data['team_id'],
                                            channel="DDCL7GCV7",
