@@ -104,6 +104,7 @@ def delete_gif(event_data, channel):
 
 
 def add_sample(event_data, channel):
+    print("trying..")
     message = event_data['event']['text']
     clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", " ")
     print(clean_msg)
