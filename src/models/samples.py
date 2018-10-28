@@ -28,12 +28,17 @@ class Samples(object):
         entries = database.find("samples", ({}))
         return [cls(**entry) for entry in entries]
 
-    @staticmethod
-    def find_entry(text):
+    @classmethod
+    def find_entry(cls, text):
         database = Database()
         database.initialize()
         entry = database.find_one("samples", {"text": text})
-        return entry
+        return cls(**entry)
+
+    def remove_entry(self):
+        database = Database()
+        database.initialize()
+        database.remove("samples", self.json())
 
     @classmethod
     def evaluate(cls, msg):
@@ -54,6 +59,16 @@ class Samples(object):
 
     @classmethod
     def test(cls):
+        samples = ["deploying rel_ to staging",
+                   "deployed rel_ to staging",
+                   "deployed rel_ to prod",
+                   "deploying rel_ to prod",
+                   "rel_ release notes"]
+
+        for sample in samples:
+            sample = Samples(text=sample)
+            sample.add_entry()
+
         raws = ['DΕΡLΟΥΙΝG rel_70 to staging',
                 "Deploying the latest rel_71 to staging",
                 "rel_70\nRelease notes",
@@ -64,6 +79,10 @@ class Samples(object):
             tests.append(Samples.evaluate(i))
         if all(tests):
             print("Tests passed")
+
+        for sample in samples:
+            sample_obj = Samples.find_entry(sample)
+            sample_obj.remove_entry()
 
 
 Samples.test()
