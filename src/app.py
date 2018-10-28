@@ -79,9 +79,9 @@ def events():
 
 
 def send_gif(event_data, channel):
-    response = SlackCommands.send_gif(team_id=event_data['team_id'], channel=channel)
-    print("response to sent message: {}".format(response))
     if MessageLog.get_entry_by_ts(event_data['event']['event_ts']) is None:
+        response = SlackCommands.send_gif(team_id=event_data['team_id'], channel=channel)
+        print("response to sent message: {}".format(response))
         message = MessageLog(trigger_ts=event_data['event']['event_ts'],
                              gif_ts=response['ts'])
         print("message log entry: {}".format(message.json()))
@@ -93,7 +93,6 @@ def delete_gif(event_data, channel):
     print("delete check result: {}".format(delete_check))
     if delete_check is not None:
         SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
-
 
 
 def add_sample(event_data, channel):
