@@ -3,7 +3,7 @@ from flask import Flask, request, Response, make_response
 from models.slack_commands import SlackCommands
 from models.logging import Logging
 from models.message_log import MessageLog
-from models.regex import Regex
+from models.samples import Samples
 import unicodedata
 import re
 
@@ -55,7 +55,6 @@ def return_fact():
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
-    pattern = re.compile(Regex.get_main_regex().regex)
     Logging.add_entry(event_data)
     if "challenge" in event_data:
         return make_response(
@@ -70,13 +69,13 @@ def events():
         if all([("event" in event_data),
                 (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
-                (pattern.findall(unicodedata.normalize('NFKC', event_data['event']['text'].lower().replace(" ", "").replace("\n", ""))))]):
+                (Samples.evaluate(event_data['event']['text']))]):
             send_gif(event_data, channel)
         elif all([("event" in event_data),
                   (event_data['event']['channel'] == "DDCL7GCV7"),
                   (event_data['event']['user'] == "U1V9CPH89"),
                   (event_data['event']['channel'])]):
-            if add_regex(event_data=event_data, channel=channel):
+            if add_sample(event_data=event_data, channel=channel):
                 SlackCommands.send_message(team_id=event_data['team_id'],
                                            channel="DDCL7GCV7",
                                            message="I gotchu fam :+1:")
@@ -105,21 +104,24 @@ def delete_gif(event_data, channel):
         SlackCommands.delete_message(team_id=event_data['team_id'], channel_id=channel, ts=delete_check.gif_ts)
 
 
-def add_regex(event_data, channel):
+def add_sample(event_data, channel):
     message = event_data['event']['text']
-    clean_msg = unicodedata.normalize('NFKC', message).lower().replace(" ", "").replace("\n", "")
-    existing_check = Regex.find_entry(clean_msg)
+    clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", "")
+    existing_check = Samples.find_entry(clean_msg)
     if existing_check is not None:
         return False
     else:
-        regex = Regex(regex=clean_msg, type="sub")
-        regex.add_entry()
-        Regex.update_main_regex()
+        sample = Samples(text=clean_msg)
+        sample.add_entry()
         send_gif(event_data=event_data, channel=channel)
         return True
 
+# def authenticate_signature(request):
+#
+
 # team_freedom = G5GB3E2UQ
 # phill test = GCPJJ4G3U
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=4500)
