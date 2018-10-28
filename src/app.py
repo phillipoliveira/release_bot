@@ -73,8 +73,7 @@ def events():
             send_gif(event_data, channel)
         elif all([("event" in event_data),
                   (event_data['event']['channel'] == "DDCL7GCV7"),
-                  (event_data['event']['user'] == "U1V9CPH89"),
-                  (event_data['event']['channel'])]):
+                  (event_data['event']['user'] == "U1V9CPH89")]):
             if add_sample(event_data=event_data, channel=channel):
                 SlackCommands.send_message(team_id=event_data['team_id'],
                                            channel="DDCL7GCV7",
@@ -107,14 +106,16 @@ def delete_gif(event_data, channel):
 def add_sample(event_data, channel):
     message = event_data['event']['text']
     clean_msg = unicodedata.normalize('NFKC', message).lower().replace("\n", "")
-    existing_check = Samples.find_entry(clean_msg)
-    if existing_check is not None:
-        return False
-    else:
-        sample = Samples(text=clean_msg)
-        sample.add_entry()
-        send_gif(event_data=event_data, channel=channel)
-        return True
+    if clean_msg.split()[:1] == "learn":
+        clean_msg = " ".join(clean_msg.split()[1:])
+        existing_check = Samples.find_entry(clean_msg)
+        if existing_check is not None:
+            return False
+        else:
+            sample = Samples(text=clean_msg)
+            sample.add_entry()
+            send_gif(event_data=event_data, channel=channel)
+            return True
 
 # def authenticate_signature(request):
 #
