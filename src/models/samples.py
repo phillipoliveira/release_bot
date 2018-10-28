@@ -52,22 +52,22 @@ class Samples(object):
             for combination in combinations:
                 nums.append(jellyfish.jaro_distance(sample.text,
                                                     " ".join(combination)))
-        if max(nums) > 0.85:
+        if max(nums, default=0) > 0.85:
             return True
         else:
             return False
 
     @classmethod
     def test(cls):
-        samples = ["deploying rel_ to staging",
-                   "deployed rel_ to staging",
-                   "deployed rel_ to prod",
-                   "deploying rel_ to prod",
-                   "rel_ release notes"]
-
-        for sample in samples:
-            sample = Samples(text=sample)
-            sample.add_entry()
+        # samples = ["deploying rel_ to staging",
+        #            "deployed rel_ to staging",
+        #            "deployed rel_ to prod",
+        #            "deploying rel_ to prod",
+        #            "rel_ release notes"]
+        #
+        # for sample in samples:
+        #     sample = Samples(text=sample)
+        #     sample.add_entry()
 
         raws = ['DΕΡLΟΥΙΝG rel_70 to staging',
                 "Deploying the latest rel_71 to staging",
@@ -80,9 +80,9 @@ class Samples(object):
         if all(tests):
             print("Tests passed")
 
-        for sample in samples:
-            sample_obj = Samples.find_entry(sample)
-            sample_obj.remove_entry()
+        # for sample in samples:
+        #     sample_obj = Samples.find_entry(sample)
+        #     sample_obj.remove_entry()
 
 
 Samples.test()

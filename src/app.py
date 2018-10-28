@@ -66,7 +66,6 @@ def events():
         if event_data['event']['subtype'] == 'message_deleted':
             delete_gif(event_data, channel)
     except KeyError:
-        print("keyerror")
         if all([("event" in event_data),
                 (event_data['event']['channel'] == channel),
                 (event_data['event']['type'] == "message"),
