@@ -48,10 +48,20 @@ class Samples(object):
         samples = cls.get_entries()
         nums = []
         no_weirdness = unidecode(msg)
-        msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))
+        # cast all characters to ascii
+        msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))[:120]
+        # normalize, only judge the first 120 characters
+        len_set = set()
+        combo_dict = {}
+        for sample in samples:
+            len_set.add(min(len(sample.text.split()), len(msg.split())))
+        # make a list of the different combination lengths you'll need to check
+        for l in len_set:
+            combo_dict[l] = list(itertools.combinations(msg.split(), l))
+        # bake that list into a dict, tying it together with all combinations of that length
         for sample in samples:
             test_length = min(len(sample.text.split()), len(msg.split()))
-            combinations = itertools.combinations(msg.split(), test_length)
+            combinations = combo_dict[test_length]
             for combination in combinations:
                 nums.append(jellyfish.jaro_distance(sample.text,
                                                     " ".join(combination)))
