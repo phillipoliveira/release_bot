@@ -41,16 +41,6 @@ def post_install():
         return Response('It worked!')
 
 
-@app.route('/release_bot/learn', methods=['POST'])
-def return_fact():
-    # Echo the URL verification challenge code back to Slack
-    response = app.response_class(
-        response={"text": "I gotchu bro"},
-        status=200,
-        mimetype='application/json')
-    return response
-
-
 @app.route('/release_bot/events', methods=['POST'])
 def events():
     event_data = json.loads(request.data.decode('utf-8'))
@@ -66,24 +56,23 @@ def events():
         if event_data['event']['subtype'] == 'message_deleted':
             delete_gif(event_data, channel)
     except KeyError:
-        if MessageLog.get_entry_by_ts(event_data['event']['event_ts']) is None:
-            if all([("event" in event_data),
-                    (event_data['event']['channel'] == channel),
-                    (event_data['event']['type'] == "message"),
-                    (Samples.evaluate(event_data['event']['text']))]):
-                send_gif(event_data, channel)
-            elif all([("event" in event_data),
-                      (event_data['event']['channel'] == "DDCL7GCV7"),
-                      (event_data['event']['user'] == "U1V9CPH89")]):
-                print("got here")
-                if add_sample(event_data=event_data, channel=channel):
-                    SlackCommands.send_message(team_id=event_data['team_id'],
-                                               channel="DDCL7GCV7",
-                                               message="I gotchu fam :+1:")
-                else:
-                    SlackCommands.send_message(team_id=event_data['team_id'],
-                                               channel="DDCL7GCV7",
-                                               message="Already added :D")
+        if all([("event" in event_data),
+                (event_data['event']['channel'] == channel),
+                (event_data['event']['type'] == "message"),
+                (Samples.evaluate(event_data['event']['text']))]):
+            send_gif(event_data, channel)
+        elif all([("event" in event_data),
+                  (event_data['event']['channel'] == "DDCL7GCV7"),
+                  (event_data['event']['user'] == "U1V9CPH89")]):
+            print("got here")
+            if add_sample(event_data=event_data, channel=channel):
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel="DDCL7GCV7",
+                                           message="I gotchu fam :+1:")
+            else:
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel="DDCL7GCV7",
+                                           message="Already added :D")
 
     finally:
         return json.dumps({'success': True}), 200, {"content_type": "application/json"}
@@ -92,10 +81,11 @@ def events():
 def send_gif(event_data, channel):
     response = SlackCommands.send_gif(team_id=event_data['team_id'], channel=channel)
     print("response to sent message: {}".format(response))
-    message = MessageLog(trigger_ts=event_data['event']['event_ts'],
-                         gif_ts=response['ts'])
-    print("message log entry: {}".format(message.json()))
-    message.add_entry()
+    if MessageLog.get_entry_by_ts(event_data['event']['event_ts']) is None:
+        message = MessageLog(trigger_ts=event_data['event']['event_ts'],
+                             gif_ts=response['ts'])
+        print("message log entry: {}".format(message.json()))
+        message.add_entry()
 
 
 def delete_gif(event_data, channel):
