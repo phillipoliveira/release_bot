@@ -33,7 +33,10 @@ class Samples(object):
         database = Database()
         database.initialize()
         entry = database.find_one("samples", {"text": text})
-        return cls(**entry)
+        if entry is not None:
+            return cls(**entry)
+        else:
+            return None
 
     def remove_entry(self):
         database = Database()
@@ -85,4 +88,5 @@ class Samples(object):
             sample_obj.remove_entry()
 
 
-Samples.test()
+# Samples.test()
+
