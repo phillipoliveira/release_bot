@@ -51,7 +51,7 @@ def events():
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
     print("event data: {}".format(event_data))
-    channel = "GCPJJ4G3U"
+    channel = "G5GB3E2UQ"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
             delete_gif(event_data, channel)
