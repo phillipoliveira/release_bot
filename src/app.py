@@ -120,7 +120,7 @@ def authenticate_request(passed_request):
     ts = passed_request.headers['X-Slack-Request-Timestamp']
     if abs(int(ts) - time.time()) > 360:
         return False
-    request_body = urlencode(json.loads(passed_request.data.decode('utf-8')))
+    request_body = urlencode(passed_request.data.decode('utf-8'))
     print(request_body)
     slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode()
     print(slack_signing_secret)
