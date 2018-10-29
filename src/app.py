@@ -5,6 +5,7 @@ from models.logging import Logging
 from models.message_log import MessageLog
 from models.samples import Samples
 import unicodedata
+from urllib.parse import urlencode
 import re
 
 import json
@@ -43,7 +44,8 @@ def post_install():
 
 @app.route('/release_bot/events', methods=['POST'])
 def events():
-    print(request.get_data())
+    print(urlencode(request.get_data()))
+    print(request.headers['X-Slack-Request-Timestamp'])
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
     Logging.add_entry(event_data)
