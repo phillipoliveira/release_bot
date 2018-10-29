@@ -47,6 +47,7 @@ def post_install():
 
 @app.route('/release_bot/events', methods=['POST'])
 def events():
+    print(request.data)
     if authenticate_request(request):
         event_data = json.loads(request.data.decode('utf-8'))
         # Echo the URL verification challenge code back to Slack
@@ -120,13 +121,13 @@ def authenticate_request(passed_request):
     ts = passed_request.headers['X-Slack-Request-Timestamp']
     if abs(int(ts) - time.time()) > 360:
         return False
-    request_body = urlencode(passed_request.data.decode('utf-8'))
+    request_body = urlencode(json.loads(passed_request.data.decode('utf-8')))
     print(request_body)
-    slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode()
+    slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode('utf-8')
     print(slack_signing_secret)
-    sig_basestring = ('v0:' + str(ts) + ":" + request_body).encode()
+    sig_basestring = ('v0:' + str(ts) + ":" + request_body).encode('utf-8')
     print(sig_basestring)
-    hash_digest = hmac.new(slack_signing_secret, msg=sig_basestring, digestmod=hashlib.sha256).hexdigest()
+    hash_digest = hmac.new(slack_signing_secret, sig_basestring, hashlib.sha256).hexdigest()
     print(hash_digest)
     my_signature = 'v0=' + hash_digest
     print(my_signature)
