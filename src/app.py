@@ -44,8 +44,7 @@ def post_install():
 
 @app.route('/release_bot/events', methods=['POST'])
 def events():
-    print(request.data)
-    print(type(request.data))
+    print(urlencode(json.loads(request.data.decode('utf-8'))))
     print(request.headers['X-Slack-Request-Timestamp'])
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
