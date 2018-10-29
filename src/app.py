@@ -43,7 +43,7 @@ def post_install():
 
 @app.route('/release_bot/events', methods=['POST'])
 def events():
-    print(request.url)
+    print(request.get_data())
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
     Logging.add_entry(event_data)
