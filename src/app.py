@@ -122,7 +122,7 @@ def authenticate_request(passed_request):
         return False
     request_body = urlencode(json.loads(passed_request.data.decode('utf-8')))
     print(request_body)
-    slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret']
+    slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode()
     print(slack_signing_secret)
     sig_basestring = 'v0:' + str(ts) + ":" + request_body
     print(sig_basestring)
