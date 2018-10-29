@@ -124,7 +124,7 @@ def authenticate_request(passed_request):
     print(request_body)
     slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode()
     print(slack_signing_secret)
-    sig_basestring = 'v0:' + str(ts) + ":" + request_body
+    sig_basestring = ('v0:' + str(ts) + ":" + request_body).encode()
     print(sig_basestring)
     hash_digest = hmac.new(slack_signing_secret, msg=sig_basestring, digestmod=hashlib.sha256).hexdigest()
     print(hash_digest)
