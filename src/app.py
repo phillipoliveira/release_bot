@@ -84,6 +84,7 @@ def events():
     else:
         return json.dumps({'success': False}), 401, {"content_type": "application/json"}
 
+
 def send_gif(event_data, channel):
     if MessageLog.get_entry_by_ts(event_data['event']['event_ts']) is None:
         response = SlackCommands.send_gif(team_id=event_data['team_id'], channel=channel)
@@ -117,7 +118,7 @@ def add_sample(event_data, channel):
 
 def authenticate_request(passed_request):
     ts = passed_request.headers['X-Slack-Request-Timestamp']
-    if abs(ts - time.time()) > 360:
+    if abs(int(ts) - time.time()) > 360:
         return False
     request_body = urlencode(json.loads(passed_request.data.decode('utf-8')))
     print(request_body)
