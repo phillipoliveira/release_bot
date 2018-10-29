@@ -43,6 +43,7 @@ def post_install():
 
 @app.route('/release_bot/events', methods=['POST'])
 def events():
+    print(request.data)
     event_data = json.loads(request.data.decode('utf-8'))
     # Echo the URL verification challenge code back to Slack
     Logging.add_entry(event_data)
@@ -51,7 +52,7 @@ def events():
             event_data.get("challenge"), 200, {"content_type": "application/json"}
            )
     print("event data: {}".format(event_data))
-    channel = "G5GB3E2UQ"
+    channel = "GCPJJ4G3U"
     try:
         if event_data['event']['subtype'] == 'message_deleted':
             delete_gif(event_data, channel)
