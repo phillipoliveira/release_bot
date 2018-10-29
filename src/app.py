@@ -48,42 +48,42 @@ def post_install():
 @app.route('/release_bot/events', methods=['POST'])
 def events():
     print(request.data)
-    if authenticate_request(request):
-        event_data = json.loads(request.data.decode('utf-8'))
-        # Echo the URL verification challenge code back to Slack
-        Logging.add_entry(event_data)
-        if "challenge" in event_data:
-            return make_response(
-                event_data.get("challenge"), 200, {"content_type": "application/json"}
-               )
-        print("event data: {}".format(event_data))
-        channel = "GCPJJ4G3U"
-        try:
-            if event_data['event']['subtype'] == 'message_deleted':
-                delete_gif(event_data, channel)
-        except KeyError:
-            if all([("event" in event_data),
-                    (event_data['event']['channel'] == channel),
-                    (event_data['event']['type'] == "message"),
-                    (Samples.evaluate(event_data['event']['text']))]):
-                send_gif(event_data, channel)
-            elif all([("event" in event_data),
-                      (event_data['event']['channel'] == "DDCL7GCV7"),
-                      (event_data['event']['user'] == "U1V9CPH89")]):
-                print("got here")
-                if add_sample(event_data=event_data, channel=channel):
-                    SlackCommands.send_message(team_id=event_data['team_id'],
-                                               channel="DDCL7GCV7",
-                                               message="I gotchu fam :+1:")
-                else:
-                    SlackCommands.send_message(team_id=event_data['team_id'],
-                                               channel="DDCL7GCV7",
-                                               message="Already added :D")
+    # if authenticate_request(request):
+    event_data = json.loads(request.data.decode('utf-8'))
+    # Echo the URL verification challenge code back to Slack
+    Logging.add_entry(event_data)
+    if "challenge" in event_data:
+        return make_response(
+            event_data.get("challenge"), 200, {"content_type": "application/json"}
+           )
+    print("event data: {}".format(event_data))
+    channel = "G5GB3E2UQ"
+    try:
+        if event_data['event']['subtype'] == 'message_deleted':
+            delete_gif(event_data, channel)
+    except KeyError:
+        if all([("event" in event_data),
+                (event_data['event']['channel'] == channel),
+                (event_data['event']['type'] == "message"),
+                (Samples.evaluate(event_data['event']['text']))]):
+            send_gif(event_data, channel)
+        elif all([("event" in event_data),
+                  (event_data['event']['channel'] == "DDCL7GCV7"),
+                  (event_data['event']['user'] == "U1V9CPH89")]):
+            print("got here")
+            if add_sample(event_data=event_data, channel=channel):
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel="DDCL7GCV7",
+                                           message="I gotchu fam :+1:")
+            else:
+                SlackCommands.send_message(team_id=event_data['team_id'],
+                                           channel="DDCL7GCV7",
+                                           message="Already added :D")
 
-        finally:
-            return json.dumps({'success': True}), 200, {"content_type": "application/json"}
-    else:
-        return json.dumps({'success': False}), 401, {"content_type": "application/json"}
+    finally:
+        return json.dumps({'success': True}), 200, {"content_type": "application/json"}
+# else:
+#     return json.dumps({'success': False}), 401, {"content_type": "application/json"}
 
 
 def send_gif(event_data, channel):
@@ -117,25 +117,25 @@ def add_sample(event_data, channel):
         return True
 
 
-def authenticate_request(passed_request):
-    ts = passed_request.headers['X-Slack-Request-Timestamp']
-    if abs(int(ts) - time.time()) > 360:
-        return False
-    print(passed_request.args)
-    request_body = urlencode(json.loads(passed_request.data.decode('utf-8')), doseq=True)
-    print(request_body)
-    slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode('utf-8')
-    print(slack_signing_secret)
-    sig_basestring = ('v0:' + str(ts) + ":" + request_body).encode('utf-8')
-    print(sig_basestring)
-    hash_digest = hmac.new(slack_signing_secret, sig_basestring, hashlib.sha256).hexdigest()
-    print(hash_digest)
-    my_signature = 'v0=' + hash_digest
-    print(my_signature)
-    slack_signature = request.headers['X-Slack-Signature']
-    print(slack_signature)
-    if hmac.compare_digest(my_signature, slack_signature):
-        return True
+# def authenticate_request(passed_request):
+#     ts = passed_request.headers['X-Slack-Request-Timestamp']
+#     if abs(int(ts) - time.time()) > 360:
+#         return False
+#     print(passed_request.args)
+#     request_body = urlencode(json.loads(passed_request.data.decode('utf-8')), doseq=True)
+#     print(request_body)
+#     slack_signing_secret = SlackCommands.get_app_credentials()['signing_secret'].encode('utf-8')
+#     print(slack_signing_secret)
+#     sig_basestring = ('v0:' + str(ts) + ":" + request_body).encode('utf-8')
+#     print(sig_basestring)
+#     hash_digest = hmac.new(slack_signing_secret, sig_basestring, hashlib.sha256).hexdigest()
+#     print(hash_digest)
+#     my_signature = 'v0=' + hash_digest
+#     print(my_signature)
+#     slack_signature = request.headers['X-Slack-Signature']
+#     print(slack_signature)
+#     if hmac.compare_digest(my_signature, slack_signature):
+#         return True
 
 # team_freedom = G5GB3E2UQ
 # phill test = GCPJJ4G3U
