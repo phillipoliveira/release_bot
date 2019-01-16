@@ -5,6 +5,7 @@ import unicodedata
 import jellyfish
 import itertools
 from unidecode import unidecode
+import re
 
 
 class Samples(object):
@@ -49,22 +50,25 @@ class Samples(object):
         nums = []
         no_weirdness = unidecode(msg)
         # cast all characters to ascii
-        msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))[:120]
-        # normalize, only judge the first 120 characters
-        len_set = set()
-        combo_dict = {}
-        for sample in samples:
-            len_set.add(min(len(sample.text.split()), len(msg.split())))
-        # make a list of the different combination lengths you'll need to check
-        for l in len_set:
-            combo_dict[l] = list(itertools.combinations(msg.split(), l))
-        # bake that list into a dict, tying it together with all combinations of that length
-        for sample in samples:
-            test_length = min(len(sample.text.split()), len(msg.split()))
-            combinations = combo_dict[test_length]
-            for combination in combinations:
-                nums.append(jellyfish.jaro_distance(sample.text,
-                                                    " ".join(combination)))
+        if not re.search("\?", no_weirdness):
+            msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))[:120]
+            # normalize, only judge the first 120 characters
+            len_set = set()
+            combo_dict = {}
+            for sample in samples:
+                len_set.add(min(len(sample.text.split()), len(msg.split())))
+            # make a list of the different combination lengths you'll need to check
+            for l in len_set:
+                combo_dict[l] = list(itertools.combinations(msg.split(), l))
+            # bake that list into a dict, tying it together with all combinations of that length
+            for sample in samples:
+                test_length = min(len(sample.text.split()), len(msg.split()))
+                combinations = combo_dict[test_length]
+                for combination in combinations:
+                    nums.append(jellyfish.jaro_distance(sample.text,
+                                                        " ".join(combination)))
+        else:
+            return False
         if max(nums, default=0) > 0.85:
             return True
         else:
@@ -97,5 +101,6 @@ class Samples(object):
             sample_obj.remove_entry()
 
 
-Samples.test()
+# Samples.test()
 
+Samples.evaluate("Deploying migration fix to prod")
