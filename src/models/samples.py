@@ -144,15 +144,7 @@ class Samples(object):
             return release_notes
 
 
-# Samples.log_staging_deploy("mikedasilva finished deploying branch rel_93 version rel_90:1549469333:9e5b7212b5a2d2360bdb10cdef177dad79ef1435 to staging")
-# print(Samples.get_latest_release())
-# print(Samples.get_release_notes("rel_90"))
-
-# jac = JIRA('https://jira.atlassian.com')
-# auth_jira = JIRA(basic_auth=('phillip@checkout51.com', 'lycoming360'),
-#                  server="https://newsamerica.atlassian.net")
-# release_notes = ""
-# issues = auth_jira.search_issues("""fixVersion in ("rel_90")""")
-# for issue in issues:
-#     release_notes = release_notes + str(issue) + " - " + auth_jira.issue(issue).fields.summary + "\n"
-# print(release_notes)
+version = Samples.get_latest_release()
+print(version)
+release_notes = Samples.get_release_notes(version)
+print(release_notes)
