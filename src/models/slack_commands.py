@@ -127,10 +127,11 @@ class SlackCommands(object):
         slack_client.api_call("auth.test")
 
     @classmethod
-    def send_gif(cls, team_id, channel):
+    def send_gif(cls, team_id, channel, text):
         response = cls.get_slack_token(team_id).api_call("chat.postMessage",
-                                                          channel=channel,
-                                                          attachments=[
+                                                         channel=channel,
+                                                         text=text,
+                                                         attachments=[
                                                                          {
                                                                              "fallback": "Good job!",
                                                                              "image_url": GiphyCommands.get_gif()

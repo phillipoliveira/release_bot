@@ -5,7 +5,9 @@ import unicodedata
 import jellyfish
 import itertools
 from unidecode import unidecode
+from jira import JIRA
 import re
+import time
 
 
 class Samples(object):
@@ -44,63 +46,113 @@ class Samples(object):
         database.initialize()
         database.remove("samples", self.json())
 
-    @classmethod
-    def evaluate(cls, msg):
-        samples = cls.get_entries()
-        nums = []
-        no_weirdness = unidecode(msg)
-        # cast all characters to ascii
-        if not re.search("\?", no_weirdness):
-            msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))[:120]
-            # normalize, only judge the first 120 characters
-            len_set = set()
-            combo_dict = {}
-            for sample in samples:
-                len_set.add(min(len(sample.text.split()), len(msg.split())))
-            # make a list of the different combination lengths you'll need to check
-            for l in len_set:
-                combo_dict[l] = list(itertools.combinations(msg.split(), l))
-            # bake that list into a dict, tying it together with all combinations of that length
-            for sample in samples:
-                test_length = min(len(sample.text.split()), len(msg.split()))
-                combinations = combo_dict[test_length]
-                for combination in combinations:
-                    nums.append(jellyfish.jaro_distance(sample.text,
-                                                        " ".join(combination)))
-        else:
-            return False
-        if max(nums, default=0) > 0.85:
-            return True
-        else:
-            return False
-
-    @classmethod
-    def test(cls):
-        samples = ["deploying rel_ to staging",
-                   "deployed rel_ to staging",
-                   "deployed rel_ to prod",
-                   "deploying rel_ to prod",
-                   "rel_ release notes"]
-
-        for sample in samples:
-            sample = Samples(text=sample)
-            sample.add_entry()
-
-        raws = ['DΕΡLΟΥΙΝG rel_70 to staging',
-                "Deploying the latest rel_71 to staging",
-                "rel_70\nRelease notes",
-                "Deploying rel_70 to prod",
-                "ＤＥＰＬＯＹＩＮＧ rel_71 to staging"]
-        tests = []
-        for i in raws:
-            tests.append(Samples.evaluate(i))
-        print("{}/5 tests passed".format(sum(tests)))
-
-        for sample in samples:
-            sample_obj = Samples.find_entry(sample)
-            sample_obj.remove_entry()
+    # @classmethod
+    # def evaluate(cls, msg):
+    #     samples = cls.get_entries()
+    #     nums = []
+    #     no_weirdness = unidecode(msg)
+    #     # cast all characters to ascii
+    #     if not re.search("\?", no_weirdness):
+    #         msg = unicodedata.normalize('NFKC', no_weirdness.lower().replace("\n", " "))[:120]
+    #         # normalize, only judge the first 120 characters
+    #         len_set = set()
+    #         combo_dict = {}
+    #         for sample in samples:
+    #             len_set.add(min(len(sample.text.split()), len(msg.split())))
+    #         # make a list of the different combination lengths you'll need to check
+    #         for l in len_set:
+    #             combo_dict[l] = list(itertools.combinations(msg.split(), l))
+    #         # bake that list into a dict, tying it together with all combinations of that length
+    #         for sample in samples:
+    #             test_length = min(len(sample.text.split()), len(msg.split()))
+    #             combinations = combo_dict[test_length]
+    #             for combination in combinations:
+    #                 nums.append(jellyfish.jaro_distance(sample.text,
+    #                                                     " ".join(combination)))
+    #     else:
+    #         return False
+    #     if max(nums, default=0) > 0.85:
+    #         return True
+    #     else:
+    #         return False
+    #
+    # @classmethod
+    # def test(cls):
+    #     samples = ["deploying rel_ to staging",
+    #                "deployed rel_ to staging",
+    #                "deployed rel_ to prod",
+    #                "deploying rel_ to prod",
+    #                "rel_ release notes"]
+    #
+    #     for sample in samples:
+    #         sample = Samples(text=sample)
+    #         sample.add_entry()
+    #
+    #     raws = ['DΕΡLΟΥΙΝG rel_70 to staging',
+    #             "Deploying the latest rel_71 to staging",
+    #             "rel_70\nRelease notes",
+    #             "Deploying rel_70 to prod",
+    #             "ＤＥＰＬＯＹＩＮＧ rel_71 to staging"]
+    #     tests = []
+    #     for i in raws:
+    #         tests.append(Samples.evaluate(i))
+    #     print("{}/5 tests passed".format(sum(tests)))
+    #
+    #     for sample in samples:
+    #         sample_obj = Samples.find_entry(sample)
+    #         sample_obj.remove_entry()
 
 
 # Samples.test()
 
-Samples.evaluate("Deploying migration fix to prod")
+    @staticmethod
+    def get_latest_release():
+        database = Database()
+        database.initialize()
+        entries = database.find(collection="version_record",
+                                query={})
+        saved_entries = list()
+        times = list()
+        for i in entries:
+            times.append(i['time'])
+            saved_entries.append(i)
+        max_time = max(times)
+        for i in saved_entries:
+            if i['time'] == max_time:
+                version = i['version']
+                return version
+
+    @staticmethod
+    def get_release_notes(version):
+        database = Database()
+        database.initialize()
+        jira_settings = database.find_one("jira_settings", query={})
+        auth_jira = JIRA(basic_auth=(jira_settings['email'], jira_settings['password']),
+                         server=jira_settings['server'])
+        release_notes = "{} has been deployed to production! Release notes:\n".format(version)
+        issues = auth_jira.search_issues("""fixVersion in ("{}")""".format(version))
+        for issue in issues:
+            release_notes = release_notes + str(issue) + " - " + auth_jira.issue(issue).fields.summary + "\n"
+        return release_notes
+
+    @classmethod
+    def evaluate(cls, msg):
+        pattern = re.compile("finished deploying branch.* version.* to production")
+        if pattern.findall(msg):
+            version = cls.get_latest_release()
+            release_notes = Samples.get_release_notes(version)
+            return release_notes
+
+
+# Samples.log_staging_deploy("mikedasilva finished deploying branch rel_93 version rel_90:1549469333:9e5b7212b5a2d2360bdb10cdef177dad79ef1435 to staging")
+# print(Samples.get_latest_release())
+# print(Samples.get_release_notes("rel_90"))
+
+# jac = JIRA('https://jira.atlassian.com')
+# auth_jira = JIRA(basic_auth=('phillip@checkout51.com', 'lycoming360'),
+#                  server="https://newsamerica.atlassian.net")
+# release_notes = ""
+# issues = auth_jira.search_issues("""fixVersion in ("rel_90")""")
+# for issue in issues:
+#     release_notes = release_notes + str(issue) + " - " + auth_jira.issue(issue).fields.summary + "\n"
+# print(release_notes)
