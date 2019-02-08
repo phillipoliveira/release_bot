@@ -142,9 +142,3 @@ class Samples(object):
             version = cls.get_latest_release()
             release_notes = Samples.get_release_notes(version)
             return release_notes
-
-
-version = Samples.get_latest_release()
-print(version)
-release_notes = Samples.get_release_notes(version)
-print(release_notes)

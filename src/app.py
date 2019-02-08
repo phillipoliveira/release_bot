@@ -65,6 +65,7 @@ def events():
             release_notes = Samples.evaluate(event_data['event']['text'])
             if release_notes is not None:
                 text = release_notes
+                print(text)
                 send_gif(event_data=event_data,
                          channel=team_channel,
                          text=text)
