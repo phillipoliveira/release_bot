@@ -58,17 +58,20 @@ def events():
             return make_response(
                 event_data.get("challenge"), 200, {"content_type": "application/json"}
                )
-        elif all([("event" in event_data),
-                (event_data['event']['channel'] == freedom_channel),
-                (event_data['event']['type'] == "message")]):
-            Logging.log_staging_deploy(event_data['event']['text'])
-            release_notes = Samples.evaluate(event_data['event']['text'])
-            if release_notes is not None:
-                text = release_notes
-                print(text)
-                send_gif(event_data=event_data,
-                         channel=team_channel,
-                         text=text)
+        else:
+            try:
+                if all([("event" in event_data),
+                        (event_data['event']['channel'] == freedom_channel),
+                        (event_data['event']['type'] == "message")]):
+                    Logging.log_staging_deploy(event_data['event']['text'])
+                    release_notes = Samples.evaluate(event_data['event']['text'])
+                    if release_notes is not None:
+                        text = release_notes
+                        send_gif(event_data=event_data,
+                                 channel=team_channel,
+                                 text=text)
+            finally:
+                return json.dumps({'success': True}), 200, {"content_type": "application/json"}
     else:
         return json.dumps({'success': False}), 401, {"content_type": "application/json"}
 
