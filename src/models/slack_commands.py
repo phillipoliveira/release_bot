@@ -128,7 +128,6 @@ class SlackCommands(object):
 
     @classmethod
     def send_gif(cls, team_id, channel, text):
-        print(channel, text)
         response = cls.get_slack_token(team_id).api_call("chat.postMessage",
                                                          channel=channel,
                                                          text=text,
